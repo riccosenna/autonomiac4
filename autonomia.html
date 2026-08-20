@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Autonomia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0d0f;
+    --panel: #14171a;
+    --panel-2: #1a1e22;
+    --line: #262b30;
+    --text: #ecede9;
+    --muted: #868d96;
+    --amber: #ff7a1a;
+    --teal: #2dd4bf;
+    --red: #ff5252;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    padding: 32px 16px 64px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app{
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--amber);
+    text-transform: uppercase;
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+  }
+
+  h1{
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 4.5vw, 38px);
+    line-height: 1.15;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .lede{
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 60ch;
+    margin: 0 0 28px;
+  }
+
+  /* input panel */
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+  }
+
+  .panel-label{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin: 0 0 18px;
+  }
+
+  .input-row{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 760px){
+    .input-row{ grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .field label{
+    display:block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .input-wrap{
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  input[type="number"]{
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 12px 42px 12px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    outline: none;
+    transition: border-color .15s ease;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"]:focus{ border-color: var(--amber); }
+  input[type="number"]:focus-visible{
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+  }
+
+  .unit{
+    position: absolute;
+    right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  /* dashboard cards */
+  .dash{
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 760px){
+    .dash{ grid-template-columns: 1fr; }
+  }
+
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    border-top: 3px solid var(--line);
+  }
+  .card.on-amber{ border-top-color: var(--amber); }
+  .card.on-red{ border-top-color: var(--red); }
+  .card.on-teal{ border-top-color: var(--teal); }
+
+  .card-head{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .card-icon{
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--panel-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .card-title{
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .card-value{
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: clamp(30px, 4.2vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .card.on-amber .card-value{ color: var(--amber); }
+  .card.on-red .card-value{ color: var(--red); }
+  .card.on-teal .card-value{ color: var(--teal); }
+  .card-value.empty{
+    color: var(--muted);
+    font-size: 17px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+  }
+  .card-value .unit-label{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+
+  .card-desc{
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+  .card-desc b{
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .footnote{
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="eyebrow">Medidor de combustível offline</div>
+  <h1>Quantos KM ainda dá pra rodar?</h1>
+  <p class="lede">Informe o que você sabe do último abastecimento. O painel abaixo mostra a autonomia, quando o tanque acaba e quando voltar ao posto.</p>
+
+  <div class="panel">
+    <p class="panel-label">Dados do abastecimento</p>
+    <div class="input-row">
+      <div class="field">
+        <label for="litros">Litros abastecidos</label>
+        <div class="input-wrap">
+          <input type="number" id="litros" inputmode="decimal" min="0" step="0.1" placeholder="0">
+          <span class="unit">L</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="kmAtual">KM atual (odômetro)</label>
+        <div class="input-wrap">
+          <input type="number" id="kmAtual" inputmode="decimal" min="0" step="1" placeholder="0">
+          <span class="unit">km</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="consumo">Consumo médio</label>
+        <div class="input-wrap">
+          <input type="number" id="consumo" inputmode="decimal" min="0" step="0.1" placeholder="0" value="7">
+          <span class="unit">km/L</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="margem">Margem de segurança</label>
+        <div class="input-wrap">
+          <input type="number" id="margem" inputmode="decimal" min="0" step="0.5" value="8">
+          <span class="unit">L</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash">
+    <div class="card" id="cardAutonomia">
+      <div class="card-head">
+        <div class="card-icon">🛣️</div>
+        <div class="card-title">Autonomia</div>
+      </div>
+      <div class="card-value empty" id="valAutonomia">–</div>
+      <div class="card-desc" id="descAutonomia">preencha os campos acima</div>
+    </div>
+
+    <div class="card" id="cardSeco">
+      <div class="card-head">
+        <div class="card-icon">⚠️</div>
+        <div class="card-title">Tanque acaba em</div>
+      </div>
+      <div class="card-value empty" id="valSeco">–</div>
+      <div class="card-desc" id="descSeco">preencha os campos acima</div>
+    </div>
+
+    <div class="card" id="cardReabastecer">
+      <div class="card-head">
+        <div class="card-icon">⛽</div>
+        <div class="card-title">Abasteça de novo</div>
+      </div>
+      <div class="card-value empty" id="valReabastecer">–</div>
+      <div class="card-desc" id="descReabastecer">preencha os campos acima</div>
+    </div>
+  </div>
+
+  <p class="footnote">Cálculo aproximado a partir do consumo médio informado. Trânsito, ar-condicionado e estrada mudam o resultado real.</p>
+
+</div>
+
+<script>
+  const litrosEl = document.getElementById('litros');
+  const kmAtualEl = document.getElementById('kmAtual');
+  const consumoEl = document.getElementById('consumo');
+  const margemEl = document.getElementById('margem');
+
+  const cardAutonomia = document.getElementById('cardAutonomia');
+  const valAutonomia = document.getElementById('valAutonomia');
+  const descAutonomia = document.getElementById('descAutonomia');
+
+  const cardSeco = document.getElementById('cardSeco');
+  const valSeco = document.getElementById('valSeco');
+  const descSeco = document.getElementById('descSeco');
+
+  const cardReabastecer = document.getElementById('cardReabastecer');
+  const valReabastecer = document.getElementById('valReabastecer');
+  const descReabastecer = document.getElementById('descReabastecer');
+
+  function fmt(n){
+    return Math.round(n).toLocaleString('pt-BR');
+  }
+
+  function setEmpty(){
+    [cardAutonomia, cardSeco, cardReabastecer].forEach(c => c.className = 'card');
+    valAutonomia.className = 'card-value empty';
+    valAutonomia.textContent = '–';
+    descAutonomia.textContent = 'preencha os campos acima';
+
+    valSeco.className = 'card-value empty';
+    valSeco.textContent = '–';
+    descSeco.textContent = 'preencha os campos acima';
+
+    valReabastecer.className = 'card-value empty';
+    valReabastecer.textContent = '–';
+    descReabastecer.textContent = 'preencha os campos acima';
+  }
+
+  function calc(){
+    const litros = parseFloat(litrosEl.value);
+    const kmAtual = parseFloat(kmAtualEl.value);
+    const consumo = parseFloat(consumoEl.value);
+    const margem = parseFloat(margemEl.value);
+
+    const valid = litros > 0 && kmAtual >= 0 && consumo > 0;
+
+    if(!valid){
+      setEmpty();
+      return;
+    }
+
+    const autonomia = litros * consumo;
+    const kmLimite = kmAtual + autonomia;
+
+    cardAutonomia.className = 'card on-teal';
+    valAutonomia.className = 'card-value';
+    valAutonomia.innerHTML = fmt(autonomia) + '<span class="unit-label">km</span>';
+    descAutonomia.innerHTML = 'com <b>' + litros.toLocaleString('pt-BR') + ' L</b> no tanque e consumo de <b>' + consumo.toLocaleString('pt-BR') + ' km/L</b>';
+
+    cardSeco.className = 'card on-red';
+    valSeco.className = 'card-value';
+    valSeco.innerHTML = 'KM ' + fmt(kmLimite);
+    descSeco.innerHTML = 'ponto em que o tanque chega a <b>zero</b>, a partir do KM ' + fmt(kmAtual);
+
+    if(margem >= 0 && margem < litros){
+      const litrosUteis = litros - margem;
+      const kmReabastecer = kmAtual + litrosUteis * consumo;
+      const folga = kmReabastecer - kmAtual;
+
+      cardReabastecer.className = 'card on-amber';
+      valReabastecer.className = 'card-value';
+      valReabastecer.innerHTML = 'KM ' + fmt(kmReabastecer);
+      descReabastecer.innerHTML = 'daqui a <b>' + fmt(folga) + ' km</b>, deixando ' + margem.toLocaleString('pt-BR') + ' L de reserva';
+    } else {
+      cardReabastecer.className = 'card';
+      valReabastecer.className = 'card-value empty';
+      valReabastecer.textContent = 'margem inválida';
+      descReabastecer.textContent = 'a margem de segurança precisa ser menor que os litros abastecidos';
+    }
+  }
+
+  [litrosEl, kmAtualEl, consumoEl, margemEl].forEach(el => {
+    el.addEventListener('input', calc);
+  });
+
+  calc();
+</script>
+</body>
+</html>
